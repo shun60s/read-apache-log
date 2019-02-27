@@ -115,9 +115,9 @@ if __name__ == "__main__":
     parser.add_argument('--log_file', '-w', default='logs/', help='specify log file directory')
     parser.add_argument('--address0', '-a', default='/,/index.html', help='specify URL address')
     args = parser.parse_args()
-	
-	# Log Output format Choice:
-	#
+    
+    # Log Output format Choice:
+    #
     # (1)
     # format = r'%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"'
     
