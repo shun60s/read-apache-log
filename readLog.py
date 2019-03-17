@@ -12,7 +12,7 @@ Apache のログファイルを読み込んで、指定した特定のURLアド�
 python3 readLog.py -w "Logs/" -a "/, /index.html" 
 
 -w で　apacheのログファイルのあるディレクトリーを指定する。
--a で　（先頭を除いた）URLアドレスを指定する。
+-a で　（先頭を除いた）URLアドレスを指定する。　最後を*にすると、そのURLアドレスを含むものになる。
 
 IPからhost名に変換した　output_ip-reversed.csv　又は、IPが入った　output.csv　が出力される。( if 1: 又は　if 0:で切り替え）
 
@@ -54,6 +54,7 @@ def erase_bot(df, path='test_unclude_bot.csv'):
     df2=df[  ~( df['agent'].str.contains('bot')              |   df['agent'].str.contains('Bot'))]  # use ~, not use "not" or !
     df2=df2[ ~(df2['agent'].str.contains('Hatena-Favicon2')  |  df2['agent'].str.contains('com.google.GoogleMobile'))]  # use ~, not use "not" or !
     df2=df2[ ~(df2['agent'].str.contains('Google Favicon')   |  df2['agent'].str.contains('spider'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['agent'].str.contains('BingPreview')      |  df2['agent'].str.contains('Hatena'))]  # use ~, not use "not" or !
     if path is not None:
         df2.to_csv(path)
     return df2
@@ -104,6 +105,12 @@ def local_ip2host(df):
     #df.ip[ df['ip'].str.startswith('192.168.1.1') ]='xxxx'
     pass
 
+def local_host2name(df):
+    # change host to name, locally
+    #df.host[ df['host'].str.endswith('xxxyyyzzz.xx.xx') ]='xxx'
+    pass
+
+
 def get_files( path ):
     # get log file name list
 	return glob.glob( path + "*log*")
@@ -143,6 +150,9 @@ if __name__ == "__main__":
     
     for file0 in log_file_list:
         # print (os.path.splitext(file0)[1])
+        if file0.find('error') != -1:  # skip if error log 
+            print ('skip: ', file0)
+            continue
         if os.path.splitext(file0)[1] == '.gz':
             with gzip.open( file0, "rt") as fi:
             	for line in fi:
@@ -192,8 +202,12 @@ if __name__ == "__main__":
     
     # get specified address line
     for i, addres0 in enumerate(args.address0.split(',')):
-        label= 'GET ' + addres0.strip(' ') + ' HTTP'
-        print ('specified url address ', label)
+        if addres0.strip(' ')[-1] == '*':
+            label= 'GET ' + addres0.strip(' ')[:-1]
+            print ('specified url address ', label)
+        else:    
+            label= 'GET ' + addres0.strip(' ') + ' HTTP'
+            print ('specified url address ', label)
         df2=get_html(df, label, path=None)
         
         if i == 0:
@@ -209,6 +223,7 @@ if __name__ == "__main__":
         local_ip2host(df3)
         dic_rename={'ip':'host'}
         df3=df3.rename(columns=dic_rename)
+        local_host2name(df3)
         df3.to_csv('output_ip-reversed.csv')
     else:
         df3.to_csv('output_.csv')
