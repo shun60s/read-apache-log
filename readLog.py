@@ -10,6 +10,7 @@ Apache のログファイルを読み込んで、指定した特定のURLアド�
 
 （例）
 python3 readLog.py -w "Logs/" -a "/, /index.html" 
+python3 readLog.py -w "Logs/" -a "/*"
 
 -w で　apacheのログファイルのあるディレクトリーを指定する。
 -a で　（先頭を除いた）URLアドレスを指定する。　最後を*にすると、そのURLアドレスを含むものになる。
@@ -73,10 +74,24 @@ def erase_hit_figure(df, path='test_unclude_hit_figure.csv'):
     df2=df2[ ~(df2['get'].str.contains('.bmp')  |  df2['get'].str.contains('.pdf'))]  # use ~, not use "not" or !
     df2=df2[ ~(df2['get'].str.contains('.wav')  |  df2['get'].str.contains('.mp3'))]  # use ~, not use "not" or !
     df2=df2[ ~(df2['get'].str.contains('.ico')  |  df2['get'].str.contains('.css'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('.PNG')  |  df2['get'].str.contains('.BMP'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('.GIF')  |  df2['get'].str.contains('.JPG'))]  # use ~, not use "not" or !
     if path is not None:
         df2.to_csv(path)
     return df2
-
+    
+def erase_host(df, path='output_ip-reversed-unclude-unnecessary_host.csv'):
+    # erase the_host
+    df2=df[  ~( df['host'].str.contains('bot')  |   df['host'].str.contains('spider'))]  # use ~, not use "not" or !
+    # erase the get
+    df2=df2[ ~(df2['get'].str.contains('author=') )]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('1=%40') )]  # use ~, not use "not" or !
+    # erase the agent
+    df2=df2[ ~(df2['agent'].str.contains('Validator') | df2['host'].str.contains('Site-Verification') )]  # use ~, not use "not" or !
+    if path is not None:
+        df2.to_csv(path)
+    return df2
+    
 def get_html(df, label, path='test_html.csv'):
     # get line that includes specified label
     df2=df[ df['get'].str.contains(label)  ]
@@ -120,7 +135,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='apachelog reading')
     parser.add_argument('--log_file', '-w', default='logs/', help='specify log file directory')
-    parser.add_argument('--address0', '-a', default='/,/index.html', help='specify URL address')
+    parser.add_argument('--address0', '-a', default='/*', help='specify URL address')
     args = parser.parse_args()
     
     # Log Output format Choice:
@@ -214,6 +229,10 @@ if __name__ == "__main__":
             df3=df2.copy()
         else:
             df3=pd.concat([df3,df2])
+    # erase /HTTP/1.1 in get
+    df3['get']=df3['get'].str.replace(' HTTP/1.1','')
+    # erase 
+    df3['get']=df3['get'].str.replace('GET ','')
     
     # convert and sav csv as output
     if 1:
@@ -225,5 +244,10 @@ if __name__ == "__main__":
         df3=df3.rename(columns=dic_rename)
         local_host2name(df3)
         df3.to_csv('output_ip-reversed.csv')
+        # erase un-necessary host, get, and agent
+        #erase_host(df3)
+        
     else:
         df3.to_csv('output_.csv')
+    
+    print ('fnish')
