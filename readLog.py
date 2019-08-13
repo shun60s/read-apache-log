@@ -69,18 +69,18 @@ def get_code_200(df, path='test_code_200.csv'):
 
 def erase_hit_figure(df, path='test_unclude_hit_figure.csv'):
     # erase line that includes figure
-    df2=df[  ~( df['get'].str.contains('.jpg')  |   df['get'].str.contains('.gif'))]  # use ~, not use "not" or !
-    df2=df2[ ~(df2['get'].str.contains('.png')  |  df2['get'].str.contains('.zip'))]  # use ~, not use "not" or !
-    df2=df2[ ~(df2['get'].str.contains('.bmp')  |  df2['get'].str.contains('.pdf'))]  # use ~, not use "not" or !
-    df2=df2[ ~(df2['get'].str.contains('.wav')  |  df2['get'].str.contains('.mp3'))]  # use ~, not use "not" or !
-    df2=df2[ ~(df2['get'].str.contains('.ico')  |  df2['get'].str.contains('.css'))]  # use ~, not use "not" or !
-    df2=df2[ ~(df2['get'].str.contains('.PNG')  |  df2['get'].str.contains('.BMP'))]  # use ~, not use "not" or !
-    df2=df2[ ~(df2['get'].str.contains('.GIF')  |  df2['get'].str.contains('.JPG'))]  # use ~, not use "not" or !
+    df2=df[  ~( df['get'].str.contains('\.jpg')  |   df['get'].str.contains('\.gif'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('\.png')  |  df2['get'].str.contains('\.zip'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('\.bmp')  |  df2['get'].str.contains('\.pdf'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('\.wav')  |  df2['get'].str.contains('\.mp3'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('\.ico')  |  df2['get'].str.contains('\.css'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('\.PNG')  |  df2['get'].str.contains('\.BMP'))]  # use ~, not use "not" or !
+    df2=df2[ ~(df2['get'].str.contains('\.GIF')  |  df2['get'].str.contains('\.JPG'))]  # use ~, not use "not" or !
     if path is not None:
         df2.to_csv(path)
     return df2
     
-def erase_host(df, path='output_ip-reversed-unclude-unnecessary_host.csv'):
+def erase_host(df, path='output_ip-reversed-unclude_host.csv'):
     # erase the_host
     df2=df[  ~( df['host'].str.contains('bot')  |   df['host'].str.contains('spider'))]  # use ~, not use "not" or !
     # erase the get
@@ -234,7 +234,7 @@ if __name__ == "__main__":
     # erase 
     df3['get']=df3['get'].str.replace('GET ','')
     
-    # convert and sav csv as output
+    # convert and save csv as output
     if 1:
         # convert ip2host
         dic=get_ip(df3)
