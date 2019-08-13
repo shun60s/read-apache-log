@@ -128,7 +128,7 @@ def local_host2name(df):
 
 def get_files( path ):
     # get log file name list
-	return glob.glob( path + "*log*")
+    return glob.glob( path + "*log*")
 
 
 if __name__ == "__main__":
